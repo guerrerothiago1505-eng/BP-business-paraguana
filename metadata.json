@@ -1,0 +1,9 @@
+
+{
+  "name": "Business Paraguaná",
+  "description": "Tu aliado integral en negocios, propiedades y servicios en la región de Paraguaná. Una super-app que combina autogestión con acompañamiento humano experto.",
+  "requestFramePermissions": [
+    "camera",
+    "notifications"
+  ]
+}

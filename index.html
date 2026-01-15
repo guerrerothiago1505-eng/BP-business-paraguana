@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Paraguaná | Tu Aliado Estratégico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                red: '#A11B20',
+                redDark: '#7A0F12',
+                gold: '#C5A059',
+                goldLight: '#EAD2A0',
+                slate: '#121212',
+                beige: '#E8E2D9', // Oscurecido un poco más manteniendo el tono
+                offwhite: '#F9F7F2'
+              }
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              display: ['Playfair Display', 'serif']
+            },
+            boxShadow: {
+              'premium': '0 20px 50px rgba(0,0,0,0.06)',
+              'gold-glow': '0 10px 30px rgba(197, 160, 89, 0.15)'
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #E8E2D9; /* Fondo Beige un poco más oscuro */
+            color: #1A1A1A;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .safe-area-bottom {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .gold-gradient {
+            background: linear-gradient(135deg, #EAD2A0 0%, #C5A059 100%);
+        }
+        .red-gradient {
+            background: linear-gradient(135deg, #C41E24 0%, #7A0F12 100%);
+        }
+        .luxury-card {
+            background: white;
+            border-radius: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.01);
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            animation: slideDown 0.5s ease-out;
+        }
+        @keyframes slideDown {
+            from { transform: translate(-50%, -100%); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="no-scrollbar">
+    <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
