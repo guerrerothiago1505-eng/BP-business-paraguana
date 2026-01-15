@@ -18,14 +18,23 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate, onListingClick, his
   // Sincronización de tasas oficiales BCV - Proyección 2026
   useEffect(() => {
     const fetchRates = async () => {
-      // Simulación de delay de red para realismo
-      setTimeout(() => {
-        setRates({
-          usd: '339.14',
-          eur: '395.26',
-          loading: false
-        });
-      }, 1000);
+      try {
+        const response = await fetch('https://pydolarve.org/api/v1/dollar?page=bcv');
+        const data = await response.json();
+        if (data && data.monitors && data.monitors.usd && data.monitors.eur) {
+          setRates({
+            usd: data.monitors.usd.price.toString(),
+            eur: data.monitors.eur.price.toString(),
+            loading: false
+          });
+        } else {
+          // Fallback en caso de que la estructura de la API cambie
+          setRates({ usd: '339.14', eur: '395.26', loading: false });
+        }
+      } catch (error) {
+        console.error("Error fetching rates:", error);
+        setRates({ usd: '339.14', eur: '395.26', loading: false });
+      }
     };
     fetchRates();
   }, []);

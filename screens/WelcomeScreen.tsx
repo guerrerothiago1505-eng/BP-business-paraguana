@@ -9,18 +9,21 @@ interface WelcomeScreenProps {
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart, onLogin }) => {
   return (
-    <div className="h-screen flex flex-col items-center justify-between p-10 bg-white text-center">
+    <div className="h-screen flex flex-col items-center justify-between p-10 bg-brand-offwhite text-center">
       <div className="flex-1 flex flex-col items-center justify-center w-full max-w-sm">
         {/* New High Impact Emblem */}
-        <div className="w-full aspect-square animate-float">
+        <div className="w-full aspect-square animate-float drop-shadow-[0_35px_35px_rgba(197,160,89,0.2)]">
           <Logo />
         </div>
         
         <div className="mt-8 space-y-4">
+          <h1 className="text-3xl font-display font-black text-brand-slate uppercase tracking-tight">
+            Exclusividad <span className="text-brand-red">Estratégica</span>
+          </h1>
           <p className="text-[10px] font-black text-brand-gold uppercase tracking-[0.6em] animate-pulse">
-            Tu Aliado Estratégico
+            Tu Aliado en la Península
           </p>
-          <div className="h-0.5 bg-slate-100 w-16 mx-auto"></div>
+          <div className="h-0.5 bg-brand-gold/30 w-16 mx-auto"></div>
         </div>
       </div>
 

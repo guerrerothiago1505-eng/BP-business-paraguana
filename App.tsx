@@ -139,8 +139,8 @@ const App: React.FC = () => {
   const showNavbar = ['home', 'requests', 'chat', 'profile', 'realestate', 'services', 'business', 'request-detail', 'post-property', 'post-vehicle', 'listing-detail', 'favorites', 'service-form', 'admin-dashboard', 'about'].includes(currentView);
 
   return (
-    <div className="w-full min-h-screen bg-brand-beige flex justify-center overflow-x-hidden font-sans">
-      <div className={`w-full max-w-screen-xl relative bg-brand-beige shadow-2xl border-x border-slate-100 flex flex-col ${showNavbar ? 'pb-24' : ''}`}>
+    <div className="w-full min-h-screen bg-brand-slate flex justify-center overflow-x-hidden font-sans">
+      <div className={`w-full max-w-screen-xl relative bg-brand-beige shadow-[0_0_100px_rgba(0,0,0,0.5)] border-x border-white/5 flex flex-col ${showNavbar ? 'pb-24' : ''}`}>
         
         {lastEmailSent && (
           <div className="toast-notification fixed top-6 right-6 z-[200] max-w-xs animate-in slide-in-from-right duration-500">
