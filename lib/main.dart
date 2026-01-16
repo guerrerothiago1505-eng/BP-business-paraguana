@@ -207,4 +207,3 @@ const NavItem = ({ active, icon, label, onClick }: any) => {
   );
 };
 
-export default App;
