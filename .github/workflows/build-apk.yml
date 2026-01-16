@@ -22,8 +22,10 @@ jobs:
           flutter-version: '3.24.3'
           channel: 'stable'
 
-      - name: 🛠 Reparar Proyecto (Gradle Fix)
-        run: flutter create . --platforms=android --overwrite
+      - name: 🛠 Reparar Proyecto (Nombre Forzado)
+        run: |
+          # Aquí forzamos el nombre correcto ignorando el nombre del repositorio
+          flutter create . --project-name=bp_business_paraguana --platforms=android --overwrite
 
       - name: 📦 Instalar dependencias
         run: flutter pub get
