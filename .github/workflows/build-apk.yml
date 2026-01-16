@@ -23,7 +23,7 @@ jobs:
           channel: 'stable'
 
       - name: 🛠 Reparar Proyecto (Nombre Forzado)
-        run: |
+        run: 
           # Aquí forzamos el nombre correcto ignorando el nombre del repositorio
           flutter create . --project-name=bp_business_paraguana --platforms=android --overwrite
 
