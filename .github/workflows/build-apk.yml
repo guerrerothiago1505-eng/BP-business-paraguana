@@ -24,7 +24,7 @@ jobs:
 
       - name: 🛠 Reparar Proyecto (Nombre Forzado)
         run: 
-          # Aquí forzamos el nombre correcto ignorando el nombre del repositorio
+          # El parámetro --project-name obliga a Flutter a ignorar el nombre de la carpeta
           flutter create . --project-name=bp_business_paraguana --platforms=android --overwrite
 
       - name: 📦 Instalar dependencias
