@@ -1,44 +1,28 @@
-name: Build Flutter APK
-
-on:
-  push:
-    branches: [ main ]          
-  workflow_dispatch:            
+name: Reparar y Construir APK
+on: [push, workflow_dispatch]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
-      - name: 🔍 Debug - Ver archivos actuales
-        run: |
-          echo "Listado de archivos en la raíz:"
-          ls -F
-          echo "Buscando main.dart..."
-          find . -name "main.dart"
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
+      
+      - uses: subosito/flutter-action@v2
         with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.3'  
           channel: 'stable'
 
-      - name: Install dependencies
+      - name: 🛠 Reparar Estructura de Proyecto
+        run: |
+          # Esto crea los archivos de Android que te faltan automáticamente
+          flutter create . --overwrite --platforms=android
+
+      - name: 📦 Instalar Dependencias
         run: flutter pub get
 
-      - name: Build APK (release)
-        run: flutter build apk --release --split-per-abi -t lib/main.dart
-
-      - name: Upload APK as artifact
-        uses: actions/upload-artifact@v4
+      - name: 🚀 Construir APK
+        run: flutter build apk --release --split-per-abi
+        
+      - uses: actions/upload-artifact@v4
         with:
-          name: release-apk
+          name: MiApp-Instalable
           path: build/app/outputs/flutter-apk/*.apk
