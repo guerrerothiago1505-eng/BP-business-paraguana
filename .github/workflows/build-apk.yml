@@ -3,7 +3,7 @@ on: [push, workflow_dispatch]
 
 jobs:
   build:
-    runs-on: run: flutter build apk --release --split-per-abi -t lib/main.dart
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
@@ -11,18 +11,19 @@ jobs:
         with:
           channel: 'stable'
 
-      - name:  Reparar Estructura de Proyecto
-        run:
-          # Esto crea los archivos de Android que te faltan automáticamente
-          flutter create . --overwrite --platforms=android
+      - name: 🛠 Reparar Estructura
+        run: |
+          flutter create . --platforms=android --overwrite
 
-      - name: Instalar Dependencias
+      - name: 📦 Instalar Dependencias
         run: flutter pub get
 
-      - name: Construir APK
-        run: flutter build apk --release --split-per-abi
+      - name: 🚀 Construir APK
+        # El -t lib/main.dart asegura que use TU código
+        run: flutter build apk --release --split-per-abi -t lib/main.dart
         
-      - uses: actions/upload-artifact@v4
+      - name: 📤 Subir Archivo
+        uses: actions/upload-artifact@v4
         with:
           name: MiApp-Instalable
           path: build/app/outputs/flutter-apk/*.apk
