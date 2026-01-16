@@ -12,6 +12,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: 🔍 Debug - Ver archivos actuales
+        run: |
+          echo "Listado de archivos en la raíz:"
+          ls -F
+          echo "Buscando main.dart..."
+          find . -name "main.dart"
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -26,16 +33,12 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-        
 
       - name: Build APK (release)
-        run: flutter build apk --release --split-per-abi  
-       
+        run: flutter build apk --release --split-per-abi -t lib/main.dart
 
       - name: Upload APK as artifact
         uses: actions/upload-artifact@v4
-        
-        
         with:
           name: release-apk
           path: build/app/outputs/flutter-apk/*.apk
