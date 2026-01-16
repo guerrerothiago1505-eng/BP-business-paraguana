@@ -23,9 +23,7 @@ jobs:
           channel: 'stable'
 
       - name: 🛠 Reparar Proyecto (Gradle Fix)
-        run: |
-          # Este comando regenera la carpeta android con la versión correcta
-          flutter create . --platforms=android --overwrite
+        run: flutter create . --platforms=android --overwrite
 
       - name: 📦 Instalar dependencias
         run: flutter pub get
