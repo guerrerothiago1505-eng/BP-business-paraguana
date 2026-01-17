@@ -1,5 +1,5 @@
-name: bp_business_paraguana
-description: "Business Paraguana App"
+name: business_paraguana_app  # Cambiamos el nombre aquí
+description: "App oficial de Business Paraguana"
 publish_to: 'none'
 version: 1.0.0+1
 
