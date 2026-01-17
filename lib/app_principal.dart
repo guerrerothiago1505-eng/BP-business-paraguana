@@ -1,121 +1,289 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:animations/animations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.dark,
-  ));
-  runApp(const BusinessParaguanaApp());
-}
+void main() => runApp(const BPApp());
 
 class BPColors {
   static const Color red = Color(0xFFA11B20);
   static const Color redDark = Color(0xFF7A0F12);
   static const Color gold = Color(0xFFC5A059);
-  static const Color slate = Color(0xFF121212);
-  static const Color beige = Color(0xFFE8E2D9);
-  static const LinearGradient redGradient = LinearGradient(
-    colors: [red, redDark],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
+  static const Color slate = Color(0xFF1A1A1A);
+  static const Color beige = Color(0xFFF8F5F0);
 }
 
-class BusinessParaguanaApp extends StatelessWidget {
-  const BusinessParaguanaApp({super.key});
+class BPApp extends StatelessWidget {
+  const BPApp({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Business Paraguaná',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        scaffoldBackgroundColor: BPColors.beige,
-        textTheme: GoogleFonts.interTextTheme(),
-      ),
-      home: const WelcomeScreen(),
+      theme: ThemeData(scaffoldBackgroundColor: BPColors.beige),
+      home: const AuthWrapper(),
     );
   }
 }
 
+// --- LÓGICA DE PERSISTENCIA (INICIO AUTOMÁTICO) ---
+class AuthWrapper extends StatefulWidget {
+  const AuthWrapper({super.key});
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    _checkLogin();
+  }
+
+  void _checkLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool('isLoggedIn') ?? false) {
+      if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const DashboardPage()));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => const WelcomeScreen();
+}
+
+// --- PANTALLA DE BIENVENIDA (ESTILO REACT) ---
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 30),
+      body: Padding(
+        padding: const EdgeInsets.all(40.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const BPLogo(size: 200),
-            const SizedBox(height: 40),
-            Text('BIENVENIDO A', style: GoogleFonts.montserrat(letterSpacing: 4, fontSize: 10, fontWeight: FontWeight.w900, color: Colors.grey[500])),
-            Text('BUSINESS', style: GoogleFonts.playfairDisplay(fontSize: 42, fontWeight: FontWeight.w900, letterSpacing: 2)),
-            Text('PARAGUANÁ', style: GoogleFonts.playfairDisplay(fontSize: 42, fontWeight: FontWeight.w900, color: BPColors.red, letterSpacing: 2)),
-            const SizedBox(height: 60),
-            _btn(context, "YA SOY USUARIO", Colors.white, BPColors.slate, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MainNavigation()))),
-            const SizedBox(height: 20),
-            _btn(context, "REGISTRARME", BPColors.red, Colors.white, () => mostrarContrato(context)),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const BPLogo(size: 220),
+                  const SizedBox(height: 20),
+                  Text('BUSINESS', style: GoogleFonts.montserrat(fontSize: 38, fontWeight: FontWeight.w900, color: BPColors.slate, letterSpacing: -2)),
+                  Text('PARAGUANÁ', style: GoogleFonts.montserrat(fontSize: 38, fontWeight: FontWeight.w900, color: BPColors.red, letterSpacing: -2)),
+                  Container(height: 2, width: 40, color: BPColors.gold, margin: const EdgeInsets.symmetric(vertical: 15)),
+                  Text('CONSULTORÍA & SERVICIOS', style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w900, color: BPColors.gold, letterSpacing: 5)),
+                ],
+              ),
+            ),
+            Column(
+              children: [
+                _btn("ACCESO CLIENTE VIP", true, () => _showLogin(context)),
+                const SizedBox(height: 15),
+                _btn("SOLICITAR MEMBRESÍA", false, () => _showRegister(context)),
+              ],
+            )
           ],
         ),
       ),
     );
   }
 
-  Widget _btn(BuildContext context, String txt, Color bg, Color tc, VoidCallback fn) {
-    return SizedBox(width: double.infinity, height: 65, child: ElevatedButton(onPressed: fn, style: ElevatedButton.styleFrom(backgroundColor: bg, foregroundColor: tc, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))), child: Text(txt, style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2))));
+  Widget _btn(String txt, bool isRed, VoidCallback ontap) {
+    return SizedBox(
+      width: double.infinity,
+      height: 70,
+      child: ElevatedButton(
+        onPressed: ontap,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: isRed ? BPColors.red : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          elevation: isRed ? 10 : 0,
+          side: isRed ? BorderSide.none : const BorderSide(color: Color(0xFFEEEEEE)),
+        ),
+        child: Text(txt, style: GoogleFonts.montserrat(color: isRed ? Colors.white : Colors.grey, fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: 2)),
+      ),
+    );
+  }
+
+  // --- MODAL DE REGISTRO CON "BÓVEDA" ---
+  void _showRegister(BuildContext context) {
+    final nameCtrl = TextEditingController();
+    final cedulaCtrl = TextEditingController();
+    final mailCtrl = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(50))),
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, left: 30, right: 30, top: 40),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("SOLICITUD DE ALIANZA", style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, color: BPColors.red)),
+            const SizedBox(height: 20),
+            TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: "Nombre Completo")),
+            TextField(controller: cedulaCtrl, decoration: const InputDecoration(labelText: "Cédula de Identidad")),
+            TextField(controller: mailCtrl, decoration: const InputDecoration(labelText: "Correo Electrónico")),
+            const SizedBox(height: 20),
+            const Text("🔒 Verificación Biométrica Requerida", style: TextStyle(fontSize: 12, color: BPColors.gold)),
+            const SizedBox(height: 30),
+            _btn("ACEPTAR Y GUARDAR EN BÓVEDA", true, () async {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setString('user_name', nameCtrl.text);
+              await prefs.setString('user_mail', mailCtrl.text);
+              await prefs.setBool('isLoggedIn', true);
+              if (context.mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const DashboardPage()));
+            }),
+            const SizedBox(height: 40),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showLogin(BuildContext context) {
+    // Aquí implementas la validación contra la boveda (SharedPreferences)
+    Navigator.push(context, MaterialPageRoute(builder: (_) => const DashboardPage()));
   }
 }
 
+// --- DASHBOARD (CLON EXACTO DE TU REACT) ---
+class DashboardPage extends StatelessWidget {
+  const DashboardPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(30),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 50),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("HOLA, ALIADO", style: GoogleFonts.montserrat(fontSize: 24, fontWeight: FontWeight.w900)),
+                    Text("VIP MASTER ACCESS", style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w900, color: BPColors.red, letterSpacing: 2)),
+                  ],
+                ),
+                const CircleAvatar(backgroundColor: Colors.white, radius: 28, child: Text("🔔"))
+              ],
+            ),
+            const SizedBox(height: 30),
+            // Ticker de Monedas
+            Container(
+              padding: const EdgeInsets.all(25),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(40), border: Border.all(color: Colors.white)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _coin("USD", "339.14"),
+                  Container(width: 1, height: 30, color: Colors.grey[200]),
+                  _coin("EUR", "395.26"),
+                ],
+              ),
+            ),
+            const SizedBox(height: 30),
+            // Mercado Virtual Card
+            Container(
+              height: 220,
+              width: double.infinity,
+              padding: const EdgeInsets.all(35),
+              decoration: BoxDecoration(gradient: BPColors.redGradient, borderRadius: BorderRadius.circular(50), boxShadow: [BoxShadow(color: BPColors.red.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))]),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("MERCADO VIRTUAL", style: GoogleFonts.montserrat(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w900)),
+                  Text("ACTIVOS DE ALTO VALOR", style: GoogleFonts.montserrat(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 3)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 30),
+            // Grid de Opciones
+            GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 2,
+              mainAxisSpacing: 20,
+              crossAxisSpacing: 20,
+              children: [
+                _gridItem("💼", "NEGOCIOS"),
+                _gridItem("⚖️", "LEGAL"),
+                _gridItem("🏠", "INMUEBLES"),
+                _gridItem("🚚", "LOGÍSTICA"),
+              ],
+            ),
+            const SizedBox(height: 100),
+          ],
+        ),
+      ),
+      bottomNavigationBar: _navBar(),
+    );
+  }
+
+  Widget _coin(String label, String value) {
+    return Column(children: [
+      Text(label, style: GoogleFonts.montserrat(fontSize: 8, fontWeight: FontWeight.w900, color: BPColors.gold)),
+      Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+    ]);
+  }
+
+  Widget _gridItem(String emoji, String label) {
+    return Container(
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(45), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)]),
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Text(emoji, style: const TextStyle(fontSize: 40)),
+        const SizedBox(height: 10),
+        Text(label, style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1)),
+      ]),
+    );
+  }
+
+  Widget _navBar() {
+    return Container(
+      height: 100,
+      decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(50))),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _navIcon("🏠", "INICIO", true),
+          _navIcon("💼", "MERCADO", false),
+          _navIcon("💬", "ASESOR", false),
+          _navIcon("👤", "PERFIL", false),
+        ],
+      ),
+    );
+  }
+
+  Widget _navIcon(String icon, String label, bool active) {
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      Container(width: 50, height: 50, decoration: BoxDecoration(color: active ? BPColors.red : Colors.transparent, borderRadius: BorderRadius.circular(15)), child: Center(child: Text(icon, style: const TextStyle(fontSize: 20)))),
+      Text(label, style: GoogleFonts.montserrat(fontSize: 8, fontWeight: FontWeight.w900, color: active ? BPColors.red : Colors.grey)),
+    ]);
+  }
+}
+
+// --- EL PAINTER DEL LOGO IA ---
 class BPLogo extends StatelessWidget {
   final double size;
   const BPLogo({super.key, this.size = 150});
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(width: size, height: size, child: CustomPaint(painter: LogoPainter()));
-  }
+  Widget build(BuildContext context) => SizedBox(width: size, height: size, child: CustomPaint(painter: LogoPainter()));
 }
 
 class LogoPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final double w = size.width;
-    final double h = size.height;
-    final double scale = w / 500;
-    final crimson = Paint()..shader = const LinearGradient(colors: [Color(0xFFC41E24), Color(0xFF7A0F12)]).createShader(Rect.fromLTWH(0, 0, w, h));
-    final gold = Paint()..shader = const LinearGradient(colors: [Color(0xFFEAD2A0), Color(0xFFC5A059), Color(0xFF8F7135)]).createShader(Rect.fromLTWH(0, 0, w, h));
-    var p1 = Path()..moveTo(250*scale, 40*scale)..lineTo(80*scale, 340*scale)..lineTo(160*scale, 340*scale)..lineTo(250*scale, 160*scale)..close();
-    var p2 = Path()..moveTo(250*scale, 40*scale)..lineTo(420*scale, 340*scale)..lineTo(340*scale, 340*scale)..lineTo(250*scale, 160*scale)..close();
-    canvas.drawPath(p1, crimson); canvas.drawPath(p2, gold);
+    final scale = size.width / 500;
+    final crimson = Paint()..shader = const LinearGradient(colors: [Color(0xFFC41E24), Color(0xFF7A0F12)]).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+    final gold = Paint()..shader = const LinearGradient(colors: [Color(0xFFEAD2A0), Color(0xFFC5A059)]).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+    canvas.drawPath(Path()..moveTo(250*scale, 40*scale)..lineTo(80*scale, 340*scale)..lineTo(160*scale, 340*scale)..lineTo(250*scale, 160*scale)..close(), crimson);
+    canvas.drawPath(Path()..moveTo(250*scale, 40*scale)..lineTo(420*scale, 340*scale)..lineTo(340*scale, 340*scale)..lineTo(250*scale, 160*scale)..close(), gold);
   }
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
-}
-
-class MainNavigation extends StatefulWidget {
-  const MainNavigation({super.key});
-  @override
-  State<MainNavigation> createState() => _MainNavigationState();
-}
-
-class _MainNavigationState extends State<MainNavigation> {
-  int _idx = 0;
-  final _pages = [const Center(child: Text("INICIO")), const Center(child: Text("MERCADO")), const Center(child: Text("ASESOR")), const Center(child: Text("PERFIL"))];
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_idx],
-      bottomNavigationBar: BottomNavigationBar(currentIndex: _idx, onTap: (i) => setState(() => _idx = i), selectedItemColor: BPColors.red, unselectedItemColor: Colors.grey, type: BottomNavigationBarType.fixed, items: const [BottomNavigationBarItem(icon: Icon(Icons.home), label: 'INICIO'), BottomNavigationBarItem(icon: Icon(Icons.business_center), label: 'MERCADO'), BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'ASESOR'), BottomNavigationBarItem(icon: Icon(Icons.person), label: 'PERFIL')]),
-    );
-  }
-}
-
-void mostrarContrato(BuildContext context) {
-  showDialog(context: context, builder: (c) => AlertDialog(title: const Text("Contrato de Resguardo"), content: const Text("Acepto las condiciones de corretaje de Business Paraguaná."), actions: [TextButton(onPressed: () { Navigator.pop(c); Navigator.push(context, MaterialPageRoute(builder: (_) => const MainNavigation())); }, child: const Text("ACEPTAR"))]));
+  bool shouldRepaint(old) => false;
 }
