@@ -6,9 +6,18 @@ import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Esta línea activa la conexión real con tu archivo google-services.json
+  // Esta línea activará la conexión real gracias al automatizador de GitHub
   await Firebase.initializeApp();
+  
+  // Configuramos notificaciones en segundo plano
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  
   runApp(const BusinessParaguanaApp());
+}
+
+// Manejador de notificaciones cuando la app está cerrada
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
 }
 
 class BPColors {
@@ -30,8 +39,45 @@ class BusinessParaguanaApp extends StatelessWidget {
   }
 }
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
+
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  
+  @override
+  void initState() {
+    super.initState();
+    _setupNotifications();
+  }
+
+  // Lógica para que el usuario reciba notificaciones REALES
+  void _setupNotifications() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    await messaging.requestPermission();
+    
+    // Escuchar mensajes cuando la app está abierta
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (mounted) {
+        _mostrarAlertaPremium(message.notification?.title ?? "Aviso", message.notification?.body ?? "");
+      }
+    });
+  }
+
+  void _mostrarAlertaPremium(String title, String body) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(title, style: const TextStyle(color: BPColors.red, fontWeight: FontWeight.bold)),
+        content: Text(body),
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("ENTENDIDO"))],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,16 +98,16 @@ class WelcomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-            _btn(context, "ACCESO CLIENTE PREMIUM", true, () => _loginReal(context)),
+            _btn("ACCESO CLIENTE PREMIUM", true, () => _loginReal(context)),
             const SizedBox(height: 15),
-            _btn(context, "SOLICITAR MEMBRESÍA", false, () => _registroReal(context)),
+            _btn("SOLICITAR MEMBRESÍA", false, () => _registroReal(context)),
           ],
         ),
       ),
     );
   }
 
-  Widget _btn(BuildContext context, String txt, bool isRed, VoidCallback ontap) {
+  Widget _btn(String txt, bool isRed, VoidCallback ontap) {
     return SizedBox(
       width: double.infinity,
       height: 70,
@@ -76,7 +122,6 @@ class WelcomeScreen extends StatelessWidget {
     );
   }
 
-  // --- LÓGICA DE REGISTRO REAL EN BÓVEDA ---
   void _registroReal(BuildContext context) {
     final nameCtrl = TextEditingController();
     final cedulaCtrl = TextEditingController();
@@ -98,7 +143,7 @@ class WelcomeScreen extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
-                // GUARDAR EN FIREBASE (BÓVEDA REAL)
+                // GUARDAR EN BÓVEDA REAL (Firestore)
                 await FirebaseFirestore.instance.collection('solicitudes').add({
                   'nombre': nameCtrl.text,
                   'cedula': cedulaCtrl.text,
@@ -106,8 +151,8 @@ class WelcomeScreen extends StatelessWidget {
                   'status': 'pendiente',
                   'fecha': FieldValue.serverTimestamp(),
                 });
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Enviado a Bóveda. Recibirás una notificación.")));
+                if (context.mounted) Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("✅ Enviado a Bóveda. El ADM revisará tu solicitud.")));
               },
               child: const Text("ENVIAR A REVISIÓN"),
             ),
@@ -119,7 +164,6 @@ class WelcomeScreen extends StatelessWidget {
   }
 
   void _loginReal(BuildContext context) {
-    // Aquí el usuario entrará con su correo y la app verificará en la boveda
     Navigator.push(context, MaterialPageRoute(builder: (_) => const DashboardPage()));
   }
 }
@@ -128,6 +172,9 @@ class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: Text("Bienvenido Aliado VIP")));
+    return Scaffold(
+      appBar: AppBar(title: const Text("Panel Aliado VIP"), backgroundColor: BPColors.red),
+      body: const Center(child: Text("Bienvenido al Mercado Virtual Real")),
+    );
   }
 }
