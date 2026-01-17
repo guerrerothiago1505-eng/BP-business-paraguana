@@ -3,7 +3,7 @@ name: Build Flutter APK
 on:
   push:
     branches:
-      - main  # Se activa cada vez que guardas cambios en la rama main
+      - main
 
 jobs:
   build:
@@ -24,11 +24,14 @@ jobs:
         with:
           flutter-version: '3.24.3'
 
+      - name: Repair Android Files
+        # Este comando recrea la carpeta android/ que está dando problemas
+        run: flutter create . --platforms=android
+
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build APK
-        # Importante: El nombre del target debe ser el mismo que tu archivo de código
         run: flutter build apk --release --target=lib/app_principal.dart --build-name=2.1.0 --build-number=5
 
       - name: Upload APK
