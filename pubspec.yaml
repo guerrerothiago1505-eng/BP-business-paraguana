@@ -1,11 +1,11 @@
-name: business_paraguana
+name: bp_business_paraguana
 description: "App Premium Business Paraguaná"
 publish_to: 'none'
 version: 2.1.0+5
 
 environment:
   sdk: '^3.5.0'
-  
+
 dependencies:
   flutter:
     sdk: flutter
