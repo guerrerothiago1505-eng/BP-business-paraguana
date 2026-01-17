@@ -21,23 +21,24 @@ jobs:
         with:
           flutter-version: '3.24.3'
 
-      - name: 🛠️ Forzar Identidad Real
+      - name: 🛠️ Cirugía de Nombre y Limpieza
         run: |
-          # Borramos CUALQUIER rastro previo de Android
+          # 1. Borrar carpetas de configuración viejas
           rm -rf android
-          # Creamos la estructura limpia CON TU NOMBRE
-          flutter create . --project-name=business_paraguana_app --org=com.business.paraguana --platforms=android --overwrite
           
-          # SUSTITUCIÓN MANUAL: Forzamos que el main.dart sea el tuyo
-          # Esto evita que Flutter use cualquier otro archivo por error
+          # 2. Recrear el proyecto con el nombre CORRECTO
+          flutter create . --project-name=business_paraguana --org=com.business.paraguana --platforms=android --overwrite
+          
+          # 3. Forzar el cambio de nombre en el Manifiesto de Android
+          find android -name "AndroidManifest.xml" -exec sed -i 's/flutter_demo/business_paraguana/g' {} +
+          
           flutter pub get
-          flutter clean
 
-      - name: 🚀 Build APK (Sin Cache)
-        run: flutter build apk --release --target=lib/main.dart
+      - name: 🚀 Build APK
+        run: flutter build apk --release
 
       - name: 📤 Guardar APK
         uses: actions/upload-artifact@v4
         with:
-          name: APK-OBLIGATORIO-BEIGE
+          name: APK-NUEVO-ID
           path: build/app/outputs/flutter-apk/app-release.apk
