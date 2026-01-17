@@ -131,6 +131,20 @@ class WelcomeView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // ESTE ES EL NUEVO CÓDIGO PARA EL LOGO:
+          Image.asset(
+            'assets/logo.png', 
+            height: 150, 
+            errorBuilder: (context, error, stackTrace) {
+              // Si la imagen no carga, muestra el maletín azul para que no se vea vacío
+              return const Icon(Icons.business_center, size: 120, color: Color(0xFF1E293B));
+            },
+          ),
+          const SizedBox(height: 30),
+          const Text('BUSINESS PARAGUANÁ', 
+            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: 2)),
+          // ... resto del código
+          
           const Icon(Icons.business_center, size: 120, color: Color(0xFF1E293B)),
           const SizedBox(height: 30),
           const Text('BUSINESS PARAGUANÁ', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: 2)),
