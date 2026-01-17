@@ -24,10 +24,11 @@ jobs:
 
       - name: Estructura Android Definitiva
         run: |
-          # REEMPLAZA 'com.tu_negocio' por el package_name de tu google-services.json
-          flutter create . --platforms android --org com."package_name": "com.example.bp_business_paraguana"
+          # 1. Creamos el proyecto con el nombre EXACTO que espera el google-services.json
+          # El org 'com.example' + project 'bp_business_paraguana' = com.example.bp_business_paraguana
+          flutter create . --platforms android --org com.example --project-name bp_business_paraguana
           
-          # Lo demás sigue igual...
+          # 2. Configuración del build.gradle RAÍZ
           cat <<EOF > android/build.gradle
           buildscript {
               repositories { google(); mavenCentral() }
@@ -41,9 +42,11 @@ jobs:
           }
           EOF
 
+          # 3. Configuración de la APP
           mkdir -p android/app
           cp google-services.json android/app/google-services.json
           echo "apply plugin: 'com.google.gms.google-services'" >> android/app/build.gradle
+
       - name: Build APK
         run: |
           flutter pub get
@@ -51,6 +54,9 @@ jobs:
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
+        with:
+          name: Business-Paraguana-Real
+          path: build/app/outputs/flutter-apk/app-release.apk
         with:
           name: Business-Paraguana-VIP
           path: build/app/outputs/flutter-apk/app-release.apk
