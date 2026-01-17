@@ -20,26 +20,21 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.3'
-          cache: false # <--- ESTO BORRA LA MEMORIA DE GITHUB
+          cache: false
 
-      - name: 🛠️ LIMPIEZA TOTAL Y FORZADO
+      - name: 🛠️ CAMBIO RADICAL DE ID
         run: |
-          # 1. Eliminamos cualquier rastro de carpetas viejas
-          rm -rf android
-          rm -rf build
-          
-          # 2. Recreamos el proyecto desde cero con tu código beige
-          flutter create . --project-name=business_paraguana --org=com.business.paraguana --platforms=android --overwrite
-          
-          # 3. Limpiamos la caché de Flutter
-          flutter clean
+          rm -rf android build
+          # Cambiamos el ID a com.bp.finalapp (esto mata la relación con la demo)
+          flutter create . --project-name=business_paraguana --org=com.bp.finalapp --platforms=android --overwrite
+          rm lib/main.dart 
           flutter pub get
 
-      - name: 🚀 CONSTRUIR APK REAL (BEIGE)
-        run: flutter build apk --release --target=lib/main.dart
+      - name: 🚀 CONSTRUIR APK LIMPIO
+        run: flutter build apk --release --target=lib/app_principal.dart
 
-      - name: 📤 SUBIR APK FINAL
+      - name: 📤 SUBIR APK
         uses: actions/upload-artifact@v4
         with:
-          name: APP-BP-BEIGE-REAL
+          name: APK-BEIGE-SIN-DEMO
           path: build/app/outputs/flutter-apk/app-release.apk
