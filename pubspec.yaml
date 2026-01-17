@@ -1,31 +1,41 @@
-name: business_paraguana
-description: "App Premium Business Paraguaná"
-publish_to: 'none'
+name: Build Flutter APK
 
-# Esta versión marca el salto al diseño ejecutivo
-version: 2.1.0+5
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
-environment:
-  sdk: '>=3.0.0 <4.0.0'
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-dependencies:
-  flutter:
-    sdk: flutter
-  cupertino_icons: ^1.0.6
-  
-  # Librerías necesarias para el código Premium que pegaste:
-  google_fonts: ^6.2.1
-  animations: ^2.0.11
-  intl: ^0.19.0
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^3.0.0
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
 
-flutter:
-  uses-material-design: true
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.3' # Versión estable actual
 
-  # Registro de tu logo para que no de error al abrir
-  assets:
-    - assets/logo.png
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build APK
+        # Aquí es donde definimos la identidad de tu APK
+        run: flutter build apk --release --target=lib/app_principal.dart --build-name=2.1.0 --build-number=5
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: Business-Paraguana-Premium-v2.1.0
+          path: build/app/outputs/flutter-apk/app-release.apk
