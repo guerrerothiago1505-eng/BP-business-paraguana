@@ -55,4 +55,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Business-Paraguana-Real
-          path: build/app/outputs/flutter-apk/app-release.apk
+          # Esta ruta con asteriscos encuentra el archivo donde sea que esté
+          path: "**/build/app/outputs/flutter-apk/app-release.apk"
