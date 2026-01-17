@@ -21,19 +21,19 @@ jobs:
         with:
           flutter-version: '3.24.3'
           channel: 'stable'
-          cache: false # <--- ESTO OBLIGA A REHACER TODO DESDE CERO
+          cache: false
 
-      - name: 🧹 Limpieza Absoluta
+      - name: 🧹 Limpieza y Reconstrucción
         run: |
           rm -rf android
-          flutter create . --project-name=bp_app_oficial --org=com.bp.oficial --platforms=android --overwrite
+          flutter create . --project-name=business_paraguana_app --org=com.business.paraguana --platforms=android --overwrite
           flutter pub get
 
       - name: 🚀 Construir APK Real
-        run: flutter build apk --release --no-tree-shake-icons
+        run: flutter build apk --release
 
       - name: 📤 Subir APK
         uses: actions/upload-artifact@v4
         with:
-          name: APP-BP-FINAL-TEST
+          name: BUSINESS-PARAGUANA-FINAL
           path: build/app/outputs/flutter-apk/app-release.apk
