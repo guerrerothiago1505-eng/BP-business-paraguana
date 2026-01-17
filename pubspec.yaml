@@ -1,7 +1,7 @@
 name: business_paraguana
 description: "App Oficial Business Paraguaná"
 publish_to: 'none'
-version: 2.0.0+2  # <--- CAMBIA ESTO
+version: 2.0.1+3  # <--- CAMBIA ESTO
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
