@@ -111,9 +111,27 @@ class _MainRouterState extends State<MainRouter> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(isActive ? activeIcon : icon, color: isActive ? const Color(0xFFBE1E2D) : Colors.slateGrey),
+         Widget _navItem(int index, IconData icon, IconData activeIcon, String label, String view) {
+    bool isActive = currentView == view;
+    // Usamos Colors.grey porque Colors.slateGrey no existe en Flutter
+    // Usamos FontWeight.w900 porque FontWeight.black a veces da problemas
+    return GestureDetector(
+      onTap: () => navigate(view),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(isActive ? activeIcon : icon, 
+              color: isActive ? const Color(0xFFBE1E2D) : Colors.grey),
           const SizedBox(height: 4),
-          Text(label, style: TextStyle(fontSize: 8, fontWeight: FontWeight.black, color: isActive ? const Color(0xFFBE1E2D) : Colors.slateGrey)),
+          Text(label, 
+              style: TextStyle(
+                  fontSize: 8, 
+                  fontWeight: FontWeight.w900, 
+                  color: isActive ? const Color(0xFFBE1E2D) : Colors.grey)),
+        ],
+      ),
+    );
+  }
         ],
       ),
     );
