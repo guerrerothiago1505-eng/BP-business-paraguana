@@ -25,14 +25,17 @@ jobs:
       - name: 🛠 Reparar Proyecto
         run: flutter create . --project-name=bp_business_paraguana --platforms=android --overwrite
 
+      - name: 🧹 Limpiar Cache
+        run: flutter clean
+
       - name: 📦 Instalar dependencias
         run: flutter pub get
 
       - name: 🚀 Construir APK
-        run: flutter build apk --release --split-per-abi -t lib/main.dart
+        run: flutter build apk --release
 
       - name: 📤 Subir APK
         uses: actions/upload-artifact@v4
         with:
-          name: APP-NUEVA-BP  # Cambiamos el nombre del paquete de descarga
+          name: APP-NUEVA-BP
           path: build/app/outputs/flutter-apk/app-release.apk
