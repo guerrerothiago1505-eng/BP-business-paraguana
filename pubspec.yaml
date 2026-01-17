@@ -1,18 +1,16 @@
 name: bp_business_paraguana
-description: "App Premium Business Paraguaná"
+description: "App Business Paraguana"
 publish_to: 'none'
-version: 2.1.0+5
+version: 2.1.2+7
 
 environment:
-  sdk: '^3.5.0'
+  sdk: '>=3.4.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.6
   google_fonts: ^6.2.1
   animations: ^2.0.11
-  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:
@@ -21,5 +19,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/logo.png
