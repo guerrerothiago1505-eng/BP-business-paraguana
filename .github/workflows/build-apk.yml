@@ -24,18 +24,23 @@ jobs:
         with:
           flutter-version: '3.24.3'
 
-      - name: Repair Android Files
-        # Este comando recrea la carpeta android/ que está dando problemas
-        run: flutter create . --platforms=android
+      - name: Force Project Repair
+        # Borramos la carpeta android vieja que tiene el nombre con errores
+        # y la recreamos con el nombre legal para Dart/Flutter
+        run: |
+          rm -rf android
+          flutter create . --project-name=bp_business_paraguana --platforms=android
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build APK
+        # Compila usando tu archivo principal
         run: flutter build apk --release --target=lib/app_principal.dart --build-name=2.1.0 --build-number=5
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
+          # El nombre del archivo que vas a descargar (aquí los guiones medios están bien)
           name: Business-Paraguana-v2-1-0
           path: build/app/outputs/flutter-apk/app-release.apk
