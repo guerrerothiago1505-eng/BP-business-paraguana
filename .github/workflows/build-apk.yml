@@ -22,14 +22,10 @@ jobs:
           flutter-version: '3.24.3'
           channel: 'stable'
 
-      - name: 🛠 Reparar Proyecto
-        run: flutter create . --project-name=bp_business_paraguana --platforms=android --overwrite
-
-      - name: 🧹 Limpiar Cache
-        run: flutter clean
-
-      - name: 📦 Instalar dependencias
-        run: flutter pub get
+      - name: 🛠 Inicializar Proyecto
+        run: |
+          flutter pub get
+          flutter clean
 
       - name: 🚀 Construir APK
         run: flutter build apk --release
@@ -37,5 +33,5 @@ jobs:
       - name: 📤 Subir APK
         uses: actions/upload-artifact@v4
         with:
-          name: APP-NUEVA-BP
+          name: BP-App-Final
           path: build/app/outputs/flutter-apk/app-release.apk
