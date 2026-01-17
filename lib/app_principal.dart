@@ -12,14 +12,12 @@ void main() {
   runApp(const BusinessParaguanaApp());
 }
 
-// --- COLORES PREMIUM ---
 class BPColors {
   static const Color red = Color(0xFFA11B20);
   static const Color redDark = Color(0xFF7A0F12);
   static const Color gold = Color(0xFFC5A059);
   static const Color slate = Color(0xFF121212);
   static const Color beige = Color(0xFFE8E2D9);
-  
   static const LinearGradient redGradient = LinearGradient(
     colors: [red, redDark],
     begin: Alignment.topLeft,
@@ -29,7 +27,6 @@ class BPColors {
 
 class BusinessParaguanaApp extends StatelessWidget {
   const BusinessParaguanaApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -45,10 +42,8 @@ class BusinessParaguanaApp extends StatelessWidget {
   }
 }
 
-// --- PANTALLA DE BIENVENIDA ---
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,58 +53,32 @@ class WelcomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const BPLogo(size: 200), // AQUÍ ESTÁ EL LOGO DE LA IA
+            const BPLogo(size: 200),
             const SizedBox(height: 40),
-            Text('BIENVENIDO A', 
-              style: GoogleFonts.montserrat(letterSpacing: 4, fontSize: 10, fontWeight: FontWeight.w900, color: Colors.grey[500])),
+            Text('BIENVENIDO A', style: GoogleFonts.montserrat(letterSpacing: 4, fontSize: 10, fontWeight: FontWeight.w900, color: Colors.grey[500])),
             Text('BUSINESS', style: GoogleFonts.playfairDisplay(fontSize: 42, fontWeight: FontWeight.w900, letterSpacing: 2)),
             Text('PARAGUANÁ', style: GoogleFonts.playfairDisplay(fontSize: 42, fontWeight: FontWeight.w900, color: BPColors.red, letterSpacing: 2)),
             const SizedBox(height: 60),
-            _authButton(context, "YA SOY USUARIO", Colors.white, BPColors.slate, () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const MainNavigation()));
-            }),
+            _btn(context, "YA SOY USUARIO", Colors.white, BPColors.slate, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MainNavigation()))),
             const SizedBox(height: 20),
-            _authButton(context, "REGISTRARME", BPColors.red, Colors.white, () {
-              mostrarContratoLegal(context);
-            }),
+            _btn(context, "REGISTRARME", BPColors.red, Colors.white, () => mostrarContrato(context)),
           ],
         ),
       ),
     );
   }
 
-  Widget _authButton(BuildContext context, String text, Color bg, Color textCol, VoidCallback action) {
-    return SizedBox(
-      width: double.infinity,
-      height: 65,
-      child: ElevatedButton(
-        onPressed: action,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: bg,
-          foregroundColor: textCol,
-          elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        ),
-        child: Text(text, style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2)),
-      ),
-    );
+  Widget _btn(BuildContext context, String txt, Color bg, Color tc, VoidCallback fn) {
+    return SizedBox(width: double.infinity, height: 65, child: ElevatedButton(onPressed: fn, style: ElevatedButton.styleFrom(backgroundColor: bg, foregroundColor: tc, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))), child: Text(txt, style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2))));
   }
 }
 
-// --- EL LOGO DE LA IA (SVG TRADUCIDO A FLUTTER) ---
 class BPLogo extends StatelessWidget {
   final double size;
   const BPLogo({super.key, this.size = 150});
-
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: CustomPaint(
-        painter: LogoPainter(),
-      ),
-    );
+    return SizedBox(width: size, height: size, child: CustomPaint(painter: LogoPainter()));
   }
 }
 
@@ -119,50 +88,16 @@ class LogoPainter extends CustomPainter {
     final double w = size.width;
     final double h = size.height;
     final double scale = w / 500;
-
-    final crimsonPaint = Paint()
-      ..shader = const LinearGradient(
-        colors: [Color(0xFFC41E24), Color(0xFF7A0F12)],
-      ).createShader(Rect.fromLTWH(0, 0, w, h));
-
-    final goldPaint = Paint()
-      ..shader = const LinearGradient(
-        colors: [Color(0xFFEAD2A0), Color(0xFFC5A059), Color(0xFF8F7135)],
-      ).createShader(Rect.fromLTWH(0, 0, w, h));
-
-    // Ala Izquierda
-    var pathLeft = Path();
-    pathLeft.moveTo(250 * scale, 40 * scale);
-    pathLeft.lineTo(80 * scale, 340 * scale);
-    pathLeft.lineTo(160 * scale, 340 * scale);
-    pathLeft.lineTo(250 * scale, 160 * scale);
-    pathLeft.close();
-    canvas.drawPath(pathLeft, crimsonPaint);
-
-    // Ala Derecha
-    var pathRight = Path();
-    pathRight.moveTo(250 * scale, 40 * scale);
-    pathRight.lineTo(420 * scale, 340 * scale);
-    pathRight.lineTo(340 * scale, 340 * scale);
-    pathRight.lineTo(250 * scale, 160 * scale);
-    pathRight.close();
-    canvas.drawPath(pathRight, goldPaint);
-    
-    // Core Central
-    final whitePaint = Paint()..color = Colors.white.withOpacity(0.9);
-    var pathCore = Path();
-    pathCore.moveTo(250 * scale, 160 * scale);
-    pathCore.lineTo(320 * scale, 300 * scale);
-    pathCore.lineTo(180 * scale, 300 * scale);
-    pathCore.close();
-    canvas.drawPath(pathCore, whitePaint);
+    final crimson = Paint()..shader = const LinearGradient(colors: [Color(0xFFC41E24), Color(0xFF7A0F12)]).createShader(Rect.fromLTWH(0, 0, w, h));
+    final gold = Paint()..shader = const LinearGradient(colors: [Color(0xFFEAD2A0), Color(0xFFC5A059), Color(0xFF8F7135)]).createShader(Rect.fromLTWH(0, 0, w, h));
+    var p1 = Path()..moveTo(250*scale, 40*scale)..lineTo(80*scale, 340*scale)..lineTo(160*scale, 340*scale)..lineTo(250*scale, 160*scale)..close();
+    var p2 = Path()..moveTo(250*scale, 40*scale)..lineTo(420*scale, 340*scale)..lineTo(340*scale, 340*scale)..lineTo(250*scale, 160*scale)..close();
+    canvas.drawPath(p1, crimson); canvas.drawPath(p2, gold);
   }
-
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
 
-// --- NAVEGACIÓN Y HOME ---
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
   @override
@@ -170,64 +105,17 @@ class MainNavigation extends StatefulWidget {
 }
 
 class _MainNavigationState extends State<MainNavigation> {
-  int _currentIndex = 0;
-  final List<Widget> _pages = [
-    const FlutterHomeScreen(),
-    const Center(child: Text('Mercado de Activos')),
-    const Center(child: Text('Chat con Asesor')),
-    const Center(child: Text('Perfil de Aliado')),
-  ];
-
+  int _idx = 0;
+  final _pages = [const Center(child: Text("INICIO")), const Center(child: Text("MERCADO")), const Center(child: Text("ASESOR")), const Center(child: Text("PERFIL"))];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: PageTransitionSwitcher(
-        transitionBuilder: (child, animation, secondaryAnimation) => SharedAxisTransition(
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          transitionType: SharedAxisTransitionType.horizontal,
-          child: child,
-        ),
-        child: _pages[_currentIndex],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        selectedItemColor: BPColors.red,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'INICIO'),
-          BottomNavigationBarItem(icon: Icon(Icons.business_center), label: 'NEGOCIOS'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'ASESOR'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'PERFIL'),
-        ],
-      ),
+      body: _pages[_idx],
+      bottomNavigationBar: BottomNavigationBar(currentIndex: _idx, onTap: (i) => setState(() => _idx = i), selectedItemColor: BPColors.red, unselectedItemColor: Colors.grey, type: BottomNavigationBarType.fixed, items: const [BottomNavigationBarItem(icon: Icon(Icons.home), label: 'INICIO'), BottomNavigationBarItem(icon: Icon(Icons.business_center), label: 'MERCADO'), BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'ASESOR'), BottomNavigationBarItem(icon: Icon(Icons.person), label: 'PERFIL')]),
     );
   }
 }
 
-class FlutterHomeScreen extends StatelessWidget {
-  const FlutterHomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text("Panel de Control Business Paraguaná"));
-  }
-}
-
-// --- MODAL LEGAL ---
-void mostrarContratoLegal(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text("Contrato de Resguardo"),
-      content: const Text("Al registrarse, usted acepta las condiciones de corretaje y resguardo de activos de Business Paraguaná (Punto Fijo)."),
-      actions: [
-        TextButton(onPressed: () {
-          Navigator.pop(context);
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const MainNavigation()));
-        }, child: const Text("ACEPTAR"))
-      ],
-    ),
-  );
+void mostrarContrato(BuildContext context) {
+  showDialog(context: context, builder: (c) => AlertDialog(title: const Text("Contrato de Resguardo"), content: const Text("Acepto las condiciones de corretaje de Business Paraguaná."), actions: [TextButton(onPressed: () { Navigator.pop(c); Navigator.push(context, MaterialPageRoute(builder: (_) => const MainNavigation())); }, child: const Text("ACEPTAR"))]));
 }
