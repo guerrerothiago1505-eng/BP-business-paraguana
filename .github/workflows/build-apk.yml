@@ -20,25 +20,26 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.3'
+          cache: false # <--- ESTO BORRA LA MEMORIA DE GITHUB
 
-      - name: 🛠️ Cirugía de Nombre y Limpieza
+      - name: 🛠️ LIMPIEZA TOTAL Y FORZADO
         run: |
-          # 1. Borrar carpetas de configuración viejas
+          # 1. Eliminamos cualquier rastro de carpetas viejas
           rm -rf android
+          rm -rf build
           
-          # 2. Recrear el proyecto con el nombre CORRECTO
+          # 2. Recreamos el proyecto desde cero con tu código beige
           flutter create . --project-name=business_paraguana --org=com.business.paraguana --platforms=android --overwrite
           
-          # 3. Forzar el cambio de nombre en el Manifiesto de Android
-          find android -name "AndroidManifest.xml" -exec sed -i 's/flutter_demo/business_paraguana/g' {} +
-          
+          # 3. Limpiamos la caché de Flutter
+          flutter clean
           flutter pub get
 
-      - name: 🚀 Build APK
-        run: flutter build apk --release
+      - name: 🚀 CONSTRUIR APK REAL (BEIGE)
+        run: flutter build apk --release --target=lib/main.dart
 
-      - name: 📤 Guardar APK
+      - name: 📤 SUBIR APK FINAL
         uses: actions/upload-artifact@v4
         with:
-          name: APK-NUEVO-ID
+          name: APP-BP-BEIGE-REAL
           path: build/app/outputs/flutter-apk/app-release.apk
