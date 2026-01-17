@@ -24,8 +24,7 @@ jobs:
 
       - name: Estructura Android Definitiva
         run: |
-          # 1. Creamos el proyecto con el nombre EXACTO que espera el google-services.json
-          # El org 'com.example' + project 'bp_business_paraguana' = com.example.bp_business_paraguana
+          # 1. Creamos el proyecto con el nombre del JSON
           flutter create . --platforms android --org com.example --project-name bp_business_paraguana
           
           # 2. Configuración del build.gradle RAÍZ
@@ -56,7 +55,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Business-Paraguana-Real
-          path: build/app/outputs/flutter-apk/app-release.apk
-        with:
-          name: Business-Paraguana-VIP
           path: build/app/outputs/flutter-apk/app-release.apk
