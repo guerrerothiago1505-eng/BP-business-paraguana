@@ -22,19 +22,24 @@ jobs:
           flutter-version: '3.24.3'
           cache: false
 
-      - name: 🛠️ CAMBIO RADICAL DE ID
+      - name: 🛠️ CAMBIO DE VERSIÓN Y LIMPIEZA
         run: |
           rm -rf android build
-          # Cambiamos el ID a com.bp.finalapp (esto mata la relación con la demo)
-          flutter create . --project-name=business_paraguana --org=com.bp.finalapp --platforms=android --overwrite
-          rm lib/main.dart 
+          # Forzamos la versión 2.0.0 y un nuevo ID (com.business.pwa)
+          flutter create . --project-name=business_paraguana --org=com.business.pwa --platforms=android --overwrite
+          
+          # Borramos el main que crea Flutter por defecto para que no haya dos
+          rm -f lib/main.dart 
+          
           flutter pub get
+          flutter clean
 
-      - name: 🚀 CONSTRUIR APK LIMPIO
-        run: flutter build apk --release --target=lib/app_principal.dart
+      - name: 🚀 CONSTRUIR APK V2
+        # Usamos el archivo que renombramos antes: app_principal.dart
+        run: flutter build apk --release --target=lib/app_principal.dart --build-name=2.0.0 --build-number=2
 
-      - name: 📤 SUBIR APK
+      - name: 📤 SUBIR APK V2
         uses: actions/upload-artifact@v4
         with:
-          name: APK-BEIGE-SIN-DEMO
+          name: APK-VERSION-2
           path: build/app/outputs/flutter-apk/app-release.apk
