@@ -37,9 +37,9 @@ jobs:
           flutter clean
 
       - name: 🚀 Compilar Versión 2.0.0
-        # Forzamos que use tu archivo app_principal.dart
-        run: flutter build apk --release app_principal.dart --build-name=2.0.0 --build-number=2
-
+        # Corregimos la ruta agregando lib/ antes del nombre
+        run: flutter build apk --release --target=lib/app_principal.dart --build-name=2.0.0 --build-number=2
+        
       - name: 📤 Subir APK V2
         uses: actions/upload-artifact@v4
         with:
