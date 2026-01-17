@@ -47,12 +47,12 @@ jobs:
           echo "apply plugin: 'com.google.gms.google-services'" >> android/app/build.gradle
 
       - name: Build APK
-        run: |
-          flutter pub get
-          flutter build apk --release --target=lib/app_principal.dart --no-tree-shake-icons
+        run: flutter build apk --release --target=lib/app_principal.dart --no-tree-shake-icons
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Business-Paraguana-Final
-          path: "**/app-release.apk"
+          # Esta ruta es infalible: busca cualquier archivo .apk en toda la carpeta de construcción
+          path: build/app/outputs/flutter-apk/*.apk
+          if-no-files-found: error
