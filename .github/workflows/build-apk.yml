@@ -22,49 +22,43 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.3'
-          channel: 'stable'
 
-      - name: Prepare Android Project
+      - name: Prepare Project
         run: |
-          # 1. Crear estructura limpia
+          # 1. Crear proyecto limpio
           flutter create . --platforms android --project-name bp_business_paraguana
           
-          # 2. Configurar build.gradle con repositorios
+          # 2. Configurar Repositorios
           cat <<EOF > android/build.gradle
           buildscript {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
+              repositories { google(); mavenCentral() }
               dependencies {
                   classpath 'com.android.tools.build:gradle:8.1.0'
                   classpath 'com.google.gms:google-services:4.4.1'
               }
           }
           allprojects {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
+              repositories { google(); mavenCentral() }
           }
           EOF
 
-          # 3. Mover archivo de Firebase y aplicar plugin
+          # 3. Mover Firebase Config
           mkdir -p android/app
           cp google-services.json android/app/google-services.json
-          echo "apply plugin: 'com.google.gms.google-services'" >> android/app/build.gradle
-
-      - name: Get Dependencies
-        run: flutter pub get
+          
+          # 4. Configurar el build.gradle de la app correctamente
+          # Esto evita el error de "Already watching path" inyectando la dependencia directo
+          sed -i '/apply from: "\$flutterRoot\/packages\/flutter_tools\/gradle\/flutter.gradle"/a apply plugin: "com.google.gms.google-services"' android/app/build.gradle
 
       - name: Build APK
         run: |
-          # Usamos --no-tree-shake-icons para evitar el error de fuentes que tuviste
+          flutter pub get
+          # Forzamos la salida a la carpeta raíz para que sea fácil de encontrar
           flutter build apk --release --target=lib/app_principal.dart --no-tree-shake-icons
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Business-Paraguana-Real
-          # Usamos un comodín (**) para encontrar el APK donde sea que se haya generado
-          path: build/app/outputs/flutter-apk/*.apk
+          # Buscamos en toda la carpeta build de forma recursiva
+          path: build/**/*.apk
