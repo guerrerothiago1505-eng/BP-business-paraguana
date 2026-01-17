@@ -21,26 +21,19 @@ jobs:
         with:
           flutter-version: '3.24.3'
           channel: 'stable'
+          cache: false # <--- ESTO OBLIGA A REHACER TODO DESDE CERO
 
-      - name: 💣 EXTERMINAR DEMO Y RECONSTRUIR
+      - name: 🧹 Limpieza Absoluta
         run: |
-          # Borramos rastro de configuraciones previas
           rm -rf android
-          rm -rf ios
-          rm -rf .dart_tool
-          
-          # Creamos el proyecto con un ID único para que no se mezcle con la demo
-          flutter create . --project-name=business_paraguana_app --org=com.business.paraguana --platforms=android --overwrite
-          
-          # Sincronizamos
+          flutter create . --project-name=bp_app_oficial --org=com.bp.oficial --platforms=android --overwrite
           flutter pub get
-          flutter clean
 
-      - name: 🚀 Construir APK REAL
-        run: flutter build apk --release --target=lib/main.dart
+      - name: 🚀 Construir APK Real
+        run: flutter build apk --release --no-tree-shake-icons
 
       - name: 📤 Subir APK
         uses: actions/upload-artifact@v4
         with:
-          name: APK-VERDADERO-BP
+          name: APP-BP-FINAL-TEST
           path: build/app/outputs/flutter-apk/app-release.apk
