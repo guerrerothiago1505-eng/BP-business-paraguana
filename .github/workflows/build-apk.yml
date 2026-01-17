@@ -26,16 +26,35 @@ jobs:
 
       - name: Prepare Android Project
         run: |
-          # Creamos la estructura de Android que no tienes
+          # 1. Crear estructura base
           flutter create . --platforms android --project-name bp_business_paraguana
           
-          # Movemos tu archivo de Firebase a donde Android lo necesita
+          # 2. Inyectar Repositorios y Google Services en el build.gradle raíz
+          cat <<EOF > android/build.gradle
+          buildscript {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+              dependencies {
+                  classpath 'com.android.tools.build:gradle:8.1.0'
+                  classpath 'com.google.gms:google-services:4.4.1'
+              }
+          }
+          allprojects {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          EOF
+
+          # 3. Aplicar el plugin en android/app/build.gradle
+          echo "apply plugin: 'com.google.gms.google-services'" >> android/app/build.gradle
+          
+          # 4. Mover el archivo de la Bóveda
           mkdir -p android/app
           cp google-services.json android/app/google-services.json
-          
-          # Configuramos los conectores de Firebase en los archivos internos
-          echo "buildscript { dependencies { classpath 'com.google.gms:google-services:4.4.1' } }" >> android/build.gradle
-          echo "apply plugin: 'com.google.gms.google-services'" >> android/app/build.gradle
 
       - name: Get Dependencies
         run: flutter pub get
