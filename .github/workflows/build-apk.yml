@@ -16,33 +16,44 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          # Eliminamos la línea de cache: gradle que causó el error anterior
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.3'
-          channel: 'stable'
 
-      - name: Generar Estructura y Firebase
+      - name: Estructura Android Definitiva
         run: |
-          # 1. Crear la estructura de Android que falta en el repo
+          # 1. Creamos el proyecto
           flutter create . --platforms android --project-name business_paraguana
           
-          # 2. Configurar el motor de Firebase
+          # 2. Configuración del build.gradle RAÍZ (android/build.gradle)
+          cat <<EOF > android/build.gradle
+          buildscript {
+              repositories { google(); mavenCentral() }
+              dependencies {
+                  classpath 'com.android.tools.build:gradle:8.1.0'
+                  classpath 'com.google.gms:google-services:4.4.1'
+              }
+          }
+          allprojects {
+              repositories { google(); mavenCentral() }
+          }
+          EOF
+
+          # 3. Mover Firebase y Configurar APP (android/app/build.gradle)
           mkdir -p android/app
           cp google-services.json android/app/google-services.json
           
-          # Inyectar las dependencias de Google en el archivo de construcción
-          sed -i '/dependencies {/a \        classpath "com.google.gms:google-services:4.4.1"' android/build.gradle
+          # Esta línea es la que fallaba; ahora usamos un método de reemplazo más limpio
           echo "apply plugin: 'com.google.gms.google-services'" >> android/app/build.gradle
 
-      - name: Construir APK
+      - name: Build APK
         run: |
           flutter pub get
           flutter build apk --release --target=lib/app_principal.dart --no-tree-shake-icons
 
-      - name: Subir APK Final
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Business-Paraguana-VIP
