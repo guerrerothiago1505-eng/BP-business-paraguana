@@ -20,26 +20,28 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.3'
-          cache: false
+          cache: false # Forzamos descarga limpia
 
-      - name: 🛠️ CAMBIO DE VERSIÓN Y LIMPIEZA
+      - name: 🛠️ Extirpación de Demo y Versión 2.0
         run: |
+          # 1. Limpieza absoluta
           rm -rf android build
-          # Forzamos la versión 2.0.0 y un nuevo ID (com.business.pwa)
-          flutter create . --project-name=business_paraguana --org=com.business.pwa --platforms=android --overwrite
           
-          # Borramos el main que crea Flutter por defecto para que no haya dos
-          rm -f lib/main.dart 
+          # 2. Recrear con ID nuevo y nombre nuevo
+          flutter create . --project-name=business_paraguana --org=com.bp.v2 --platforms=android --overwrite
+          
+          # 3. Asegurar que NO exista el archivo main.dart de la demo
+          rm -f lib/main.dart
           
           flutter pub get
           flutter clean
 
-      - name: 🚀 CONSTRUIR APK V2
-        # Usamos el archivo que renombramos antes: app_principal.dart
+      - name: 🚀 Compilar Versión 2.0.0
+        # Forzamos que use tu archivo app_principal.dart
         run: flutter build apk --release --target=lib/app_principal.dart --build-name=2.0.0 --build-number=2
 
-      - name: 📤 SUBIR APK V2
+      - name: 📤 Subir APK V2
         uses: actions/upload-artifact@v4
         with:
-          name: APK-VERSION-2
+          name: BUSINESS-P-V2
           path: build/app/outputs/flutter-apk/app-release.apk
