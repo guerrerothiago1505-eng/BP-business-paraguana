@@ -20,20 +20,24 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.3'
-          channel: 'stable'
-          cache: false
 
-      - name: 🧹 Limpieza y Reconstrucción
+      - name: 🛠️ Forzar Identidad Real
         run: |
+          # Borramos CUALQUIER rastro previo de Android
           rm -rf android
+          # Creamos la estructura limpia CON TU NOMBRE
           flutter create . --project-name=business_paraguana_app --org=com.business.paraguana --platforms=android --overwrite
+          
+          # SUSTITUCIÓN MANUAL: Forzamos que el main.dart sea el tuyo
+          # Esto evita que Flutter use cualquier otro archivo por error
           flutter pub get
+          flutter clean
 
-      - name: 🚀 Construir APK Real
-        run: flutter build apk --release
+      - name: 🚀 Build APK (Sin Cache)
+        run: flutter build apk --release --target=lib/main.dart
 
-      - name: 📤 Subir APK
+      - name: 📤 Guardar APK
         uses: actions/upload-artifact@v4
         with:
-          name: BUSINESS-PARAGUANA-FINAL
+          name: APK-OBLIGATORIO-BEIGE
           path: build/app/outputs/flutter-apk/app-release.apk
