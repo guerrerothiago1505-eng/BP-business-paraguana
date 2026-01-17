@@ -22,22 +22,25 @@ jobs:
           flutter-version: '3.24.3'
           channel: 'stable'
 
-      - name: 🛠 Reparar Estructura Android
+      - name: 💣 EXTERMINAR DEMO Y RECONSTRUIR
         run: |
-          # Borramos las carpetas de configuración viejas que dan error
+          # Borramos rastro de configuraciones previas
           rm -rf android
+          rm -rf ios
           rm -rf .dart_tool
-          # Creamos una estructura de Android nueva y limpia
-          flutter create . --project-name=bp_business_paraguana --platforms=android --overwrite
-          # Limpiamos e instalamos dependencias
+          
+          # Creamos el proyecto con un ID único para que no se mezcle con la demo
+          flutter create . --project-name=business_paraguana_app --org=com.business.paraguana --platforms=android --overwrite
+          
+          # Sincronizamos
           flutter pub get
           flutter clean
 
-      - name: 🚀 Construir APK
-        run: flutter build apk --release
+      - name: 🚀 Construir APK REAL
+        run: flutter build apk --release --target=lib/main.dart
 
       - name: 📤 Subir APK
         uses: actions/upload-artifact@v4
         with:
-          name: BP-App-Limpia
+          name: APK-VERDADERO-BP
           path: build/app/outputs/flutter-apk/app-release.apk
