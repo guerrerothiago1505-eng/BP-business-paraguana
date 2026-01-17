@@ -2,63 +2,52 @@ name: Build Business Paraguana APK
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: gradle
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.3'
+          channel: 'stable'
+          cache: true
 
-      - name: Prepare Project
+      - name: Configurar Estructura Android
         run: |
-          # 1. Crear proyecto limpio
-          flutter create . --platforms android --project-name bp_business_paraguana
+          # Generamos la carpeta android de forma limpia
+          flutter create . --platforms android --project-name business_paraguana
           
-          # 2. Configurar Repositorios
-          cat <<EOF > android/build.gradle
-          buildscript {
-              repositories { google(); mavenCentral() }
-              dependencies {
-                  classpath 'com.android.tools.build:gradle:8.1.0'
-                  classpath 'com.google.gms:google-services:4.4.1'
-              }
-          }
-          allprojects {
-              repositories { google(); mavenCentral() }
-          }
-          EOF
-
-          # 3. Mover Firebase Config
+          # Movemos el archivo de la bóveda a su lugar real
           mkdir -p android/app
           cp google-services.json android/app/google-services.json
           
-          # 4. Configurar el build.gradle de la app correctamente
-          # Esto evita el error de "Already watching path" inyectando la dependencia directo
-          sed -i '/apply from: "\$flutterRoot\/packages\/flutter_tools\/gradle\/flutter.gradle"/a apply plugin: "com.google.gms.google-services"' android/app/build.gradle
+          # Configuramos el motor de Firebase en los archivos internos
+          # Root build.gradle
+          echo "buildscript { repositories { google(); mavenCentral() }; dependencies { classpath 'com.google.gms:google-services:4.4.1' } }" > android/build.gradle
+          
+          # App build.gradle
+          echo "apply plugin: 'com.android.application'" > android/app/build.gradle
+          echo "apply plugin: 'com.google.gms.google-services'" >> android/app/build.gradle
 
-      - name: Build APK
+      - name: Construir Aplicación
         run: |
           flutter pub get
-          # Forzamos la salida a la carpeta raíz para que sea fácil de encontrar
           flutter build apk --release --target=lib/app_principal.dart --no-tree-shake-icons
 
-      - name: Upload APK
+      - name: Entregar APK
         uses: actions/upload-artifact@v4
         with:
-          name: Business-Paraguana-Real
-          # Buscamos en toda la carpeta build de forma recursiva
-          path: build/**/*.apk
+          name: Business-Paraguana-VIP
+          path: build/app/outputs/flutter-apk/app-release.apk
