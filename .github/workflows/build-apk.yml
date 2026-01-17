@@ -8,7 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -25,20 +24,14 @@ jobs:
           flutter-version: '3.24.3'
           channel: 'stable'
 
-      # ESTE PASO REPARA EL ERROR DE GRADLE
-      - name: Repair Android Project
-        run: flutter create . --platforms android
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Build APK
+      - name: Repair and Build
         run: |
-          flutter clean
-          flutter build apk --release --target=lib/app_principal.dart --build-name=2.1.2 --build-number=7
+          flutter create . --platforms android --project-name bp_business_paraguana
+          flutter pub get
+          flutter build apk --release --target=lib/app_principal.dart
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Business-Paraguana-VIP
+          name: Business-Paraguana-v2
           path: build/app/outputs/flutter-apk/app-release.apk
