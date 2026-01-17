@@ -3,12 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(); // Esto conecta la app con la Bóveda Real
+  // Esta línea activa la conexión real con tu archivo google-services.json
+  await Firebase.initializeApp();
   runApp(const BusinessParaguanaApp());
 }
 
@@ -17,44 +16,16 @@ class BPColors {
   static const Color gold = Color(0xFFC5A059);
   static const Color slate = Color(0xFF1A1A1A);
   static const Color beige = Color(0xFFF8F5F0);
-  static const LinearGradient redGradient = LinearGradient(
-    colors: [Color(0xFFC41E24), Color(0xFF7A0F12)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
 }
 
-class BPApp extends StatelessWidget {
-  const BPApp({super.key});
+class BusinessParaguanaApp extends StatelessWidget {
+  const BusinessParaguanaApp({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(scaffoldBackgroundColor: BPColors.beige),
       home: const WelcomeScreen(),
-    );
-  }
-}
-
-// --- SERVICIO DE NOTIFICACIONES Y LOGS ---
-class InternalSystem {
-  static Future<void> saveLog(String action) async {
-    final prefs = await SharedPreferences.getInstance();
-    List<String> logs = prefs.getStringList('system_logs') ?? [];
-    String timestamp = DateTime.now().toString().split('.')[0];
-    logs.insert(0, "[$timestamp] $action");
-    await prefs.setStringList('system_logs', logs);
-  }
-
-  static void showNotification(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message, style: GoogleFonts.montserrat(fontWeight: FontWeight.bold)),
-        backgroundColor: BPColors.red,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        margin: const EdgeInsets.all(20),
-      ),
     );
   }
 }
@@ -73,28 +44,24 @@ class WelcomeScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.business_center, size: 100, color: BPColors.red), // Logo temporal
+                  const Icon(Icons.business_center, size: 100, color: BPColors.red),
                   const SizedBox(height: 20),
-                  Text('BUSINESS', style: GoogleFonts.montserrat(fontSize: 38, fontWeight: FontWeight.w900, color: BPColors.slate, letterSpacing: -2)),
-                  Text('PARAGUANÁ', style: GoogleFonts.montserrat(fontSize: 38, fontWeight: FontWeight.w900, color: BPColors.red, letterSpacing: -2)),
-                  Text('CONSULTORÍA & SERVICIOS', style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w900, color: BPColors.gold, letterSpacing: 5)),
+                  Text('BUSINESS', style: GoogleFonts.montserrat(fontSize: 38, fontWeight: FontWeight.w900, color: BPColors.slate)),
+                  Text('PARAGUANÁ', style: GoogleFonts.montserrat(fontSize: 38, fontWeight: FontWeight.w900, color: BPColors.red)),
+                  Text('CLIENTE PREMIUM', style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w900, color: BPColors.gold, letterSpacing: 5)),
                 ],
               ),
             ),
-            Column(
-              children: [
-                _btn("CLIENTE PREMIUM", true, () => _showLogin(context)),
-                const SizedBox(height: 15),
-                _btn("SOLICITAR MEMBRESÍA", false, () => _showRegister(context)),
-              ],
-            )
+            _btn(context, "ACCESO CLIENTE PREMIUM", true, () => _loginReal(context)),
+            const SizedBox(height: 15),
+            _btn(context, "SOLICITAR MEMBRESÍA", false, () => _registroReal(context)),
           ],
         ),
       ),
     );
   }
 
-  Widget _btn(String txt, bool isRed, VoidCallback ontap) {
+  Widget _btn(BuildContext context, String txt, bool isRed, VoidCallback ontap) {
     return SizedBox(
       width: double.infinity,
       height: 70,
@@ -104,13 +71,17 @@ class WelcomeScreen extends StatelessWidget {
           backgroundColor: isRed ? BPColors.red : Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         ),
-        child: Text(txt, style: GoogleFonts.montserrat(color: isRed ? Colors.white : Colors.grey, fontWeight: FontWeight.w900, fontSize: 12)),
+        child: Text(txt, style: GoogleFonts.montserrat(color: isRed ? Colors.white : Colors.grey, fontWeight: FontWeight.w900)),
       ),
     );
   }
 
-  void _showRegister(BuildContext context) {
+  // --- LÓGICA DE REGISTRO REAL EN BÓVEDA ---
+  void _registroReal(BuildContext context) {
     final nameCtrl = TextEditingController();
+    final cedulaCtrl = TextEditingController();
+    final mailCtrl = TextEditingController();
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -120,18 +91,26 @@ class WelcomeScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text("NUEVA SOLICITUD DE ALIANZA", style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, color: BPColors.red)),
-            TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: "Nombre Completo")),
+            Text("SOLICITUD DE MEMBRESÍA REAL", style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, color: BPColors.red)),
+            TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: "Nombre")),
+            TextField(controller: cedulaCtrl, decoration: const InputDecoration(labelText: "Cédula")),
+            TextField(controller: mailCtrl, decoration: const InputDecoration(labelText: "Correo")),
             const SizedBox(height: 20),
-            _btn("ACEPTAR Y ENVIAR A BÓVEDA", true, () async {
-              await InternalSystem.saveLog("Registro Iniciado: ${nameCtrl.text}");
-              await InternalSystem.saveLog("Validación Biométrica: EXITOSA");
-              await InternalSystem.saveLog("Datos enviados a Bóveda Central");
-              if (context.mounted) {
-                InternalSystem.showNotification(context, "🔔 Solicitud enviada a Bóveda");
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const DashboardPage()));
-              }
-            }),
+            ElevatedButton(
+              onPressed: () async {
+                // GUARDAR EN FIREBASE (BÓVEDA REAL)
+                await FirebaseFirestore.instance.collection('solicitudes').add({
+                  'nombre': nameCtrl.text,
+                  'cedula': cedulaCtrl.text,
+                  'correo': mailCtrl.text,
+                  'status': 'pendiente',
+                  'fecha': FieldValue.serverTimestamp(),
+                });
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Enviado a Bóveda. Recibirás una notificación.")));
+              },
+              child: const Text("ENVIAR A REVISIÓN"),
+            ),
             const SizedBox(height: 40),
           ],
         ),
@@ -139,89 +118,16 @@ class WelcomeScreen extends StatelessWidget {
     );
   }
 
-  void _showLogin(BuildContext context) {
-    InternalSystem.saveLog("Intento de acceso: Cliente Premium");
+  void _loginReal(BuildContext context) {
+    // Aquí el usuario entrará con su correo y la app verificará en la boveda
     Navigator.push(context, MaterialPageRoute(builder: (_) => const DashboardPage()));
   }
 }
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(30),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 50),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("HOLA, ALIADO", style: GoogleFonts.montserrat(fontSize: 24, fontWeight: FontWeight.w900)),
-                    Text("VIP MASTER ACCESS", style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w900, color: BPColors.red, letterSpacing: 2)),
-                  ],
-                ),
-                GestureDetector(
-                  onTap: () => _showSystemLogs(context),
-                  child: const CircleAvatar(backgroundColor: Colors.white, radius: 28, child: Text("⚙️")),
-                )
-              ],
-            ),
-            const SizedBox(height: 30),
-            // Mercado Virtual Card
-            Container(
-              height: 200,
-              width: double.infinity,
-              padding: const EdgeInsets.all(35),
-              decoration: BoxDecoration(gradient: BPColors.redGradient, borderRadius: BorderRadius.circular(50)),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("MERCADO VIRTUAL", style: GoogleFonts.montserrat(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w900)),
-                  Text("SISTEMA ACTIVO", style: GoogleFonts.montserrat(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.w900)),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showSystemLogs(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    List<String> logs = prefs.getStringList('system_logs') ?? ["No hay solicitudes recientes"];
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: BPColors.slate,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(25),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("SOLICITUDES INTERNAS", style: GoogleFonts.montserrat(color: BPColors.gold, fontWeight: FontWeight.w900)),
-            const Divider(color: Colors.white24),
-            Expanded(
-              child: ListView.builder(
-                itemCount: logs.length,
-                itemBuilder: (context, i) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(logs[i], style: const TextStyle(color: Colors.white70, fontSize: 12, fontFamily: 'monospace')),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+    return const Scaffold(body: Center(child: Text("Bienvenido Aliado VIP")));
   }
 }
