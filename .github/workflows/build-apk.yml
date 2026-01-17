@@ -38,7 +38,7 @@ jobs:
 
       - name: 🚀 Compilar Versión 2.0.0
         # Corregimos la ruta agregando lib/ antes del nombre
-        run: flutter build apk --release --target=lib/app_principal.dart --build-name=2.0.0 --build-number=2
+        run: flutter build apk --release --target=lib/app_principal.dart --build-name=2.0.1 --build-number=3
         
       - name: 📤 Subir APK V2
         uses: actions/upload-artifact@v4
