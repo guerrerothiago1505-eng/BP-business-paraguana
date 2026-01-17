@@ -6,7 +6,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
-void main() => runApp(const BPApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(); // Esto conecta la app con la Bóveda Real
+  runApp(const BusinessParaguanaApp());
+}
 
 class BPColors {
   static const Color red = Color(0xFFA11B20);
