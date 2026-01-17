@@ -26,10 +26,10 @@ jobs:
 
       - name: Prepare Android Project
         run: |
-          # 1. Crear estructura base
+          # 1. Crear estructura limpia
           flutter create . --platforms android --project-name bp_business_paraguana
           
-          # 2. Inyectar Repositorios y Google Services en el build.gradle raíz
+          # 2. Configurar build.gradle con repositorios
           cat <<EOF > android/build.gradle
           buildscript {
               repositories {
@@ -49,21 +49,22 @@ jobs:
           }
           EOF
 
-          # 3. Aplicar el plugin en android/app/build.gradle
-          echo "apply plugin: 'com.google.gms.google-services'" >> android/app/build.gradle
-          
-          # 4. Mover el archivo de la Bóveda
+          # 3. Mover archivo de Firebase y aplicar plugin
           mkdir -p android/app
           cp google-services.json android/app/google-services.json
+          echo "apply plugin: 'com.google.gms.google-services'" >> android/app/build.gradle
 
       - name: Get Dependencies
         run: flutter pub get
 
       - name: Build APK
-        run: flutter build apk --release --target=lib/app_principal.dart
+        run: |
+          # Usamos --no-tree-shake-icons para evitar el error de fuentes que tuviste
+          flutter build apk --release --target=lib/app_principal.dart --no-tree-shake-icons
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Business-Paraguana-Real
-          path: build/app/outputs/flutter-apk/app-release.apk
+          # Usamos un comodín (**) para encontrar el APK donde sea que se haya generado
+          path: build/app/outputs/flutter-apk/*.apk
