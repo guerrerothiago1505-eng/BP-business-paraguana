@@ -24,10 +24,10 @@ jobs:
 
       - name: Estructura Android Definitiva
         run: |
-          # 1. Creamos el proyecto
-          flutter create . --platforms android --project-name business_paraguana
+          # REEMPLAZA 'com.tu_negocio' por el package_name de tu google-services.json
+          flutter create . --platforms android --org com."package_name": "com.example.bp_business_paraguana"
           
-          # 2. Configuración del build.gradle RAÍZ (android/build.gradle)
+          # Lo demás sigue igual...
           cat <<EOF > android/build.gradle
           buildscript {
               repositories { google(); mavenCentral() }
@@ -41,13 +41,9 @@ jobs:
           }
           EOF
 
-          # 3. Mover Firebase y Configurar APP (android/app/build.gradle)
           mkdir -p android/app
           cp google-services.json android/app/google-services.json
-          
-          # Esta línea es la que fallaba; ahora usamos un método de reemplazo más limpio
           echo "apply plugin: 'com.google.gms.google-services'" >> android/app/build.gradle
-
       - name: Build APK
         run: |
           flutter pub get
