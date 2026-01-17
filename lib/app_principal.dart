@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:animations/animations.dart';
 
 void main() {
@@ -13,6 +12,7 @@ void main() {
   runApp(const BusinessParaguanaApp());
 }
 
+// --- IDENTIDAD VISUAL ---
 class BPColors {
   static const Color red = Color(0xFFA11B20);
   static const Color redDark = Color(0xFF7A0F12);
@@ -40,11 +40,72 @@ class BusinessParaguanaApp extends StatelessWidget {
         scaffoldBackgroundColor: BPColors.beige,
         textTheme: GoogleFonts.interTextTheme(),
       ),
-      home: const MainNavigation(),
+      // Inicia en la Portada de Bienvenida
+      home: const WelcomeScreen(),
     );
   }
 }
 
+// --- PANTALLA DE PORTADA (LOGO Y ACCESO) ---
+class WelcomeScreen extends StatelessWidget {
+  const WelcomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 30),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const BPLogo(size: 180),
+            const SizedBox(height: 40),
+            Text('BIENVENIDO A', 
+              style: GoogleFonts.montserrat(letterSpacing: 4, fontSize: 10, fontWeight: FontWeight.w900, color: Colors.grey[500])),
+            Text('BUSINESS', style: GoogleFonts.playfairDisplay(fontSize: 42, fontWeight: FontWeight.w900, letterSpacing: 2)),
+            Text('PARAGUANÁ', style: GoogleFonts.playfairDisplay(fontSize: 42, fontWeight: FontWeight.w900, color: BPColors.red, letterSpacing: 2)),
+            const SizedBox(height: 60),
+            
+            // Botón Ingreso Directo
+            _authButton(context, "YA SOY USUARIO", Colors.white, BPColors.slate, () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const MainNavigation()));
+            }),
+            
+            const SizedBox(height: 20),
+            
+            // Botón Registro (Activa Contrato)
+            _authButton(context, "REGISTRARME", BPColors.red, Colors.white, () {
+              mostrarContratoLegal(context);
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _authButton(BuildContext context, String text, Color bg, Color textCol, VoidCallback action) {
+    return SizedBox(
+      width: double.infinity,
+      height: 65,
+      child: ElevatedButton(
+        onPressed: action,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: bg,
+          foregroundColor: textCol,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(color: BPColors.red.withOpacity(0.1)),
+          ),
+        ),
+        child: Text(text, style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2, fontSize: 12)),
+      ),
+    );
+  }
+}
+
+// --- SISTEMA DE NAVEGACIÓN ---
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
   @override
@@ -107,6 +168,7 @@ class _MainNavigationState extends State<MainNavigation> {
   }
 }
 
+// --- PANTALLA PRINCIPAL (DASHBOARD) ---
 class FlutterHomeScreen extends StatelessWidget {
   const FlutterHomeScreen({super.key});
 
@@ -224,6 +286,7 @@ class FlutterHomeScreen extends StatelessWidget {
   }
 }
 
+// --- COMPONENTE LOGO ---
 class BPLogo extends StatelessWidget {
   final double size;
   const BPLogo({super.key, this.size = 150});
@@ -239,13 +302,104 @@ class BPLogo extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFFF1E0B0).withOpacity(0.3), width: 1),
+              border: Border.all(color: BPColors.gold.withOpacity(0.3), width: 1),
             ),
           ),
-          Image.asset('assets/logo.png', fit: BoxFit.contain,
-            errorBuilder: (c, e, s) => const Icon(Icons.business, color: BPColors.red, size: 50)),
+          Image.asset(
+            'assets/logo.png', 
+            fit: BoxFit.contain,
+            errorBuilder: (c, e, s) => const Icon(Icons.business_center, color: BPColors.red, size: 80),
+          ),
         ],
       ),
     );
   }
+}
+
+// --- MODAL DE CONTRATO (VALIDEZ JURÍDICA) ---
+void mostrarContratoLegal(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    barrierColor: const Color(0xFF0F172A).withOpacity(0.9),
+    builder: (BuildContext context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(40),
+          child: Container(
+            color: Colors.white,
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height * 0.85,
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(35),
+                  decoration: const BoxDecoration(gradient: BPColors.redGradient),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("⚖️", style: TextStyle(fontSize: 30)),
+                      const SizedBox(height: 15),
+                      Text("CONTRATO DE RESGUARDO", 
+                        style: GoogleFonts.montserrat(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: -0.5)),
+                      Text("BUSINESS PARAGUANÁ", 
+                        style: GoogleFonts.montserrat(color: BPColors.gold, fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 2)),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.all(35),
+                    children: [
+                      _legalItem("1. OBJETO DEL MANDATO", "Autorización expresa para la gestión, publicación y promoción del activo en la plataforma BP."),
+                      _legalItem("2. COMISIÓN DE VENTA", "Inmuebles: 5%. Vehículos/Maquinaria: 3% a 5%. Arrendamientos: 1 mes."),
+                      _legalItem("3. RESPONSABILIDAD", "El Aliado garantiza la legitimidad del activo. BP se reserva el derecho de retiro por faltas éticas."),
+                      _legalItem("4. JURISDICCIÓN", "Domicilio especial en Punto Fijo, Estado Falcón, Venezuela."),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(35),
+                  child: Column(
+                    children: [
+                      Text("Usted está aceptando un documento con validez jurídica digital.", 
+                        style: TextStyle(fontSize: 8, color: Colors.grey[400], fontWeight: FontWeight.bold, letterSpacing: 1)),
+                      const SizedBox(height: 15),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 65,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => const MainNavigation()));
+                          },
+                          style: ElevatedButton.styleFrom(backgroundColor: BPColors.red, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+                          child: const Text("ACEPTO Y CONTINUAR", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2)),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
+Widget _legalItem(String title, String content) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 25),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 11, color: BPColors.slate, letterSpacing: 1)),
+        const SizedBox(height: 8),
+        Text(content, textAlign: TextAlign.justify, style: TextStyle(fontSize: 12, color: Colors.grey[600], height: 1.5)),
+      ],
+    ),
+  );
 }
